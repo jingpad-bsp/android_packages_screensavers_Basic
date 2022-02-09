@@ -20,6 +20,8 @@ import android.service.dreams.DreamService;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -70,6 +72,8 @@ public class Colors extends DreamService implements SurfaceHolder.Callback {
         setLowProfile(true);
         setFullscreen(true);
         setContentView(mSurfaceView);
+        //UNISOC:1153863 Hide navigation bar
+        hideNavigationBar();
     }
 
     @Override
@@ -125,4 +129,19 @@ public class Colors extends DreamService implements SurfaceHolder.Callback {
             LOG("Error while waiting for renderer", e);
         }
     }
+
+    /* UNISOC:1153863 Navigationbar display not clearly, hide it @{ */
+    private void hideNavigationBar() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB
+                &&  Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            View v = this.getWindow().getDecorView();
+            v.setSystemUiVisibility(View.GONE);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        }
+    }
+    /* @} */
 }
